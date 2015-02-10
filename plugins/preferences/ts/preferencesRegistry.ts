@@ -18,6 +18,7 @@
         isValid: isValid
       };
       this.$rootScope.$broadcast('HawtioPreferencesTabAdded');
+      Core.$apply(this.$rootScope);
     }
 
     public getTab(name:string) {

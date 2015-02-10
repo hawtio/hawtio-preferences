@@ -104,6 +104,7 @@ var HawtioPreferences;
                 isValid: isValid
             };
             this.$rootScope.$broadcast('HawtioPreferencesTabAdded');
+            Core.$apply(this.$rootScope);
         };
         PreferencesRegistry.prototype.getTab = function (name) {
             return this.tabs[name];
@@ -129,7 +130,8 @@ var HawtioPreferences;
 (function (HawtioPreferences) {
     HawtioPreferences._module = angular.module(HawtioPreferences.pluginName, []);
     // preference registry service that plugins can register preference pages to
-    HawtioPreferences._module.config(['$provide', function ($provide) {
+    HawtioPreferences._module.config(['$provide', '$routeProvider', function ($provide, $routeProvider) {
+        $routeProvider.when('/preferences', { templateUrl: UrlHelpers.join(HawtioPreferences.templatePath, 'preferences.html'), reloadOnSearch: false });
         $provide.decorator('preferencesRegistry', ['$delegate', '$rootScope', function ($delegate, $rootScope) {
             return new HawtioPreferences.PreferencesRegistry($rootScope);
         }]);
@@ -137,10 +139,6 @@ var HawtioPreferences;
     HawtioPreferences._module.run(['$templateCache', 'HawtioExtension', '$compile', 'preferencesRegistry', function ($templateCache, ext, $compile, preferencesRegistry) {
         ext.add('hawtio-user', function ($scope) {
             var template = $templateCache.get(UrlHelpers.join(HawtioPreferences.templatePath, 'menuItem.html'));
-            return $compile(template)($scope);
-        });
-        ext.add('hawtio-global', function ($scope) {
-            var template = $templateCache.get(UrlHelpers.join(HawtioPreferences.templatePath, 'bodyExt.html'));
             return $compile(template)($scope);
         });
         HawtioPreferences.log.debug("loaded");
@@ -152,41 +150,49 @@ var HawtioPreferences;
 /// <reference path="preferencesPlugin.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
-    HawtioPreferences._module.controller('HawtioPreferences.MenuItemController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-        $scope.showPreferences = function () {
-            $rootScope.$broadcast('HawtioPreferencesToggle');
+    HawtioPreferences._module.service('PreferencesLastPath', function () {
+        return {
+            lastPath: undefined,
+            lastTab: undefined
+        };
+    });
+    HawtioPreferences._module.controller('HawtioPreferences.MenuItemController', ['$scope', '$location', 'PreferencesLastPath', function ($scope, $location, last) {
+        $scope.gotoPreferences = function () {
+            last.lastPath = $location.path();
+            last.lastSearch = $location.search();
+            $location.path('/preferences').search({});
+            Core.$apply($scope);
         };
     }]);
-    HawtioPreferences._module.controller('HawtioPreferences.SlideoutController', ['$scope', function ($scope) {
-        $scope.showPrefs = false;
-        $scope.$on('HawtioPreferencesToggle', function () {
-            $scope.showPrefs = !$scope.showPrefs;
+    HawtioPreferences._module.controller("HawtioPreferences.PreferencesController", ["$scope", "$location", "preferencesRegistry", "PreferencesLastPath", function ($scope, $location, preferencesRegistry, last) {
+        var panels = preferencesRegistry.getTabs();
+        $scope.names = _.keys(panels);
+        $scope.$watch(function () {
+            panels = preferencesRegistry.getTabs();
+            $scope.names = _.keys(panels);
+            Core.$apply($scope);
         });
-    }]);
-})(HawtioPreferences || (HawtioPreferences = {}));
-
-/// <reference path="preferencesPlugin.ts"/>
-var HawtioPreferences;
-(function (HawtioPreferences) {
-    HawtioPreferences._module.controller("HawtioPreferences.PreferencesController", ["$scope", "$location", "preferencesRegistry", "$element", function ($scope, $location, preferencesRegistry, $element) {
-        Core.bindModelToSearchParam($scope, $location, "pref", "pref", "Core");
-        $scope.panels = preferencesRegistry.getTabs();
-        HawtioPreferences.log.debug("controller created, panels: ", $scope.panels);
-        $scope.$on('HawtioPreferencesTabAdded', function ($event) {
-            $scope.panels = preferencesRegistry.getTabs();
-            HawtioPreferences.log.debug("tab added, panels: ", $scope.panels);
-        });
-        /*
-        $scope.$watch(() => { return $element.is(':visible'); }, (newValue, oldValue) => {
-          if (newValue) {
-            setTimeout(() => {
-              $scope.panels = preferencesRegistry.getTabs();
-              log.debug("Panels: ", $scope.panels);
-              Core.$apply($scope);
-            }, 50);
-          }
-        });
-        */
+        Core.bindModelToSearchParam($scope, $location, "pref", "pref", 'Reset');
+        $scope.setPanel = function (name) {
+            $scope.pref = name;
+        };
+        $scope.active = function (name) {
+            if (name === $scope.pref) {
+                return 'active';
+            }
+            return '';
+        };
+        $scope.done = function () {
+            $location.path(last.lastPath).search(last.lastSearch);
+            Core.$apply($scope);
+        };
+        $scope.getPrefs = function (pref) {
+            var panel = panels[pref];
+            if (panel) {
+                return panel.template;
+            }
+            return undefined;
+        };
     }]);
 })(HawtioPreferences || (HawtioPreferences = {}));
 
@@ -207,6 +213,6 @@ var HawtioPreferences;
     }]);
 })(HawtioPreferences || (HawtioPreferences = {}));
 
-angular.module("hawtio-preferences-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/preferences/html/bodyExt.html","<div ng-controller=\"HawtioPreferences.SlideoutController\">\n  <div class=\"pref-slideout\" hawtio-slideout=\"showPrefs\" title=\"{{branding.appName}} Preferences\">\n    <div class=\"dialog-body\">\n      <div ng-controller=\"HawtioPreferences.PreferencesController\" title=\"\" class=\"prefs\">\n        <div class=\"row-fluid\">\n          <div class=\"tabbable\" ng-model=\"pref\">\n            <div ng-repeat=\"(name, panel) in panels\" value=\"{{name}}\" class=\"tab-pane\" title=\"{{name}}\" ng-include=\"panel.template\"></div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n");
-$templateCache.put("plugins/preferences/html/menuItem.html","<li ng-controller=\"HawtioPreferences.MenuItemController\">\n  <a href=\"\" ng-click=\"showPreferences()\">Preferences</a>\n</li>\n");
+angular.module("hawtio-preferences-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/preferences/html/menuItem.html","<li ng-controller=\"HawtioPreferences.MenuItemController\">\n  <a href=\"\" ng-click=\"gotoPreferences()\">Preferences</a>\n</li>\n");
+$templateCache.put("plugins/preferences/html/preferences.html","<div ng-controller=\"HawtioPreferences.PreferencesController\">\n  <div class=\"row\">\n    <div class=\"col-sm-9 col-md-10 col-sm-push-3 col-md-push-2\">\n      <h3>{{pref}}</h3>\n      <div ng-include=\"getPrefs(pref)\"></div>\n    </div>\n    <div class=\"col-sm-3 col-md-2 col-sm-pull-9 col-md-pull-10 sidebar-pf sidebar-pf-left\">\n      <div class=\"nav-category\">\n        <ul class=\"nav nav-pills nav-stacked\">\n          <li ng-repeat=\"name in names\" ng-class=\"active(name)\">\n            <a href=\"\" ng-click=\"setPanel(name)\">{{name}}</a>\n          </li>\n          <li class=\"align-center\">\n            <p></p>\n            <button ng-click=\"done()\">Done</button>\n            <p></p>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n");
 $templateCache.put("plugins/preferences/html/resetPreferences.html","<div ng-controller=\"HawtioPreferences.ResetPreferences\">\n  <form class=\"form-horizontal\">\n    <fieldset>\n      <div class=\"control-group\">\n        <label class=\"control-label\">\n          <strong>\n            <i class=\'yellow text-shadowed icon-warning-sign\'></i> Reset settings\n          </strong>\n        </label>\n        <div class=\"controls\">\n          <button class=\"btn btn-danger\" ng-click=\"doReset()\">Reset to defaults</button>\n          <span class=\"help-block\">Wipe settings stored by {{branding.appName}} in your browser\'s local storage</span>\n        </div>\n      </div>\n    </fieldset>\n  </form>\n</div>\n");}]); hawtioPluginLoader.addModule("hawtio-preferences-templates");

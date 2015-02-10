@@ -5,7 +5,6 @@
     "hawtio"
   ],
   "main": [
-    "dist/tabbable.js",
     "dist/hawtio-preferences.js"
   ],
   "ignore": [
