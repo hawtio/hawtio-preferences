@@ -5,8 +5,8 @@ module HawtioPreferences {
 
   // preference registry service that plugins can register preference pages to
   _module.config(['$provide', ($provide) => {
-    $provide.decorator('preferencesRegistry', ['$delegate', ($delegate) => {
-      return new HawtioPreferences.PreferencesRegistry();
+    $provide.decorator('preferencesRegistry', ['$delegate', '$rootScope', ($delegate, $rootScope) => {
+      return new HawtioPreferences.PreferencesRegistry($rootScope);
     }]);
   }]);
 

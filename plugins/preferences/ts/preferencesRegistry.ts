@@ -5,7 +5,7 @@
 
     private tabs:any = {};
 
-    constructor() {
+    constructor(private $rootScope:ng.IRootScopeService) {
 
     }
 
@@ -17,6 +17,7 @@
         template: template,
         isValid: isValid
       };
+      this.$rootScope.$broadcast('HawtioPreferencesTabAdded');
     }
 
     public getTab(name:string) {
