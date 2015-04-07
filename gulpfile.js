@@ -151,11 +151,11 @@ gulp.task('connect', ['watch'], function() {
           var path = req.originalUrl;
           // avoid returning these files, they should get pulled from js
           if (s.startsWith(path, '/plugins/') && s.endsWith(path, 'html')) {
-            console.log("returning 404 for: ", path);
+            //console.log("returning 404 for: ", path);
             res.statusCode = 404;
             res.end();
           } else {
-            console.log("allowing: ", path);
+            //console.log("allowing: ", path);
             next();
           }
         });

@@ -17,7 +17,8 @@ module HawtioPreferences {
       return $compile(template)($scope);
     });
     log.debug("loaded");
-    preferencesRegistry.addTab("Reset", "plugins/preferences/html/resetPreferences.html");
+    preferencesRegistry.addTab("Console Logging", UrlHelpers.join(templatePath, "loggingPreferences.html"));
+    preferencesRegistry.addTab("Reset", UrlHelpers.join(templatePath, "resetPreferences.html"));
   }]);
   hawtioPluginLoader.addModule(pluginName);
 }

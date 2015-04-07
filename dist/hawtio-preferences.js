@@ -142,9 +142,123 @@ var HawtioPreferences;
             return $compile(template)($scope);
         });
         HawtioPreferences.log.debug("loaded");
-        preferencesRegistry.addTab("Reset", "plugins/preferences/html/resetPreferences.html");
+        preferencesRegistry.addTab("Console Logging", UrlHelpers.join(HawtioPreferences.templatePath, "loggingPreferences.html"));
+        preferencesRegistry.addTab("Reset", UrlHelpers.join(HawtioPreferences.templatePath, "resetPreferences.html"));
     }]);
     hawtioPluginLoader.addModule(HawtioPreferences.pluginName);
+})(HawtioPreferences || (HawtioPreferences = {}));
+
+/// <reference path="preferencesPlugin.ts"/>
+/// <reference path="preferenceHelpers.ts"/>
+var HawtioPreferences;
+(function (HawtioPreferences) {
+    HawtioPreferences._module.factory("ChildLoggers", ["SchemaRegistry", function (schemas) {
+        var allLoggers = Logger['loggers'];
+        var allLoggersEnum = _.keys(allLoggers);
+        var theEnum = {};
+        _.forIn(allLoggers, function (value, key) {
+            theEnum[key] = key;
+        });
+        return theEnum;
+    }]);
+    HawtioPreferences._module.run(["ChildLoggers", "SchemaRegistry", function (loggers, schemas) {
+        schemas.addSchema('ChildLoggers', {
+            properties: {
+                logger: {
+                    type: "string",
+                    enum: loggers
+                },
+                level: {
+                    type: 'string',
+                    enum: {
+                        Off: 'OFF',
+                        Error: 'ERROR',
+                        Warn: 'WARN',
+                        Info: 'INFO',
+                        Debug: 'DEBUG'
+                    }
+                }
+            }
+        });
+    }]);
+    HawtioPreferences._module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "ChildLoggers", function ($scope, loggers) {
+        var config = {
+            properties: {
+                logBuffer: {
+                    type: 'number',
+                    default: 100,
+                    description: 'The number of log statements to keep available in the logging console'
+                },
+                globalLogLevel: {
+                    type: 'string',
+                    enum: {
+                        Off: 'OFF',
+                        Error: 'ERROR',
+                        Warn: 'WARN',
+                        Info: 'INFO',
+                        Debug: 'DEBUG'
+                    },
+                },
+                childLoggers: {
+                    type: 'array',
+                    items: {
+                        type: 'ChildLoggers'
+                    }
+                }
+            }
+        };
+        function setChildLoggers() {
+            if (!$scope.childLoggers) {
+                return;
+            }
+            _.forEach($scope.childLoggers, function (child) {
+                Logger.get(child.logger).setLevel(Logger[child.level]);
+            });
+        }
+        $scope.$watch('globalLogLevel', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                localStorage['logLevel'] = angular.toJson(Logger[newValue]);
+                Logger.setLevel(Logger[newValue]);
+                // the above overwrites child loggers according to the doc
+                setChildLoggers();
+            }
+            else {
+                try {
+                    $scope.globalLogLevel = angular.fromJson(localStorage['logLevel']).name;
+                }
+                catch (e) {
+                    $scope.globalLogLevel = 'INFO';
+                }
+                setChildLoggers();
+            }
+        });
+        $scope.$watchCollection('childLoggers', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                localStorage['childLoggers'] = angular.toJson(newValue);
+                setChildLoggers();
+            }
+            else {
+                try {
+                    $scope.childLoggers = angular.fromJson(localStorage['childLoggers']);
+                }
+                catch (e) {
+                    $scope.childLoggers = [];
+                }
+            }
+        });
+        $scope.entity = $scope;
+        $scope.config = config;
+        Core.initPreferenceScope($scope, localStorage, {
+            'logBuffer': {
+                'value': 100,
+                'converter': parseInt,
+                'formatter': parseInt,
+                'post': function (newValue) {
+                    window['LogBuffer'] = newValue;
+                }
+            }
+        });
+    }]);
 })(HawtioPreferences || (HawtioPreferences = {}));
 
 /// <reference path="preferencesPlugin.ts"/>
@@ -213,6 +327,7 @@ var HawtioPreferences;
     }]);
 })(HawtioPreferences || (HawtioPreferences = {}));
 
-angular.module("hawtio-preferences-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/preferences/html/menuItem.html","<li ng-controller=\"HawtioPreferences.MenuItemController\">\n  <a href=\"\" ng-click=\"gotoPreferences()\">Preferences</a>\n</li>\n");
+angular.module("hawtio-preferences-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/preferences/html/loggingPreferences.html","<div ng-controller=\"HawtioPreferences.LoggingPreferences\">\n  <div hawtio-form-2=\"config\" entity=\"entity\"></div>\n</div>\n");
+$templateCache.put("plugins/preferences/html/menuItem.html","<li ng-controller=\"HawtioPreferences.MenuItemController\">\n  <a href=\"\" ng-click=\"gotoPreferences()\">Preferences</a>\n</li>\n");
 $templateCache.put("plugins/preferences/html/preferences.html","<div ng-controller=\"HawtioPreferences.PreferencesController\">\n  <div class=\"row\">\n    <div class=\"col-sm-9 col-md-10 col-sm-push-3 col-md-push-2\">\n      <h3>{{pref}}</h3>\n      <div ng-include=\"getPrefs(pref)\"></div>\n    </div>\n    <div class=\"col-sm-3 col-md-2 col-sm-pull-9 col-md-pull-10 sidebar-pf sidebar-pf-left\">\n      <div class=\"nav-category\">\n        <ul class=\"nav nav-pills nav-stacked\">\n          <li ng-repeat=\"name in names\" ng-class=\"active(name)\">\n            <a href=\"\" ng-click=\"setPanel(name)\">{{name}}</a>\n          </li>\n          <li class=\"align-center\">\n            <p></p>\n            <button ng-click=\"done()\">Done</button>\n            <p></p>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n");
 $templateCache.put("plugins/preferences/html/resetPreferences.html","<div ng-controller=\"HawtioPreferences.ResetPreferences\">\n  <form class=\"form-horizontal\">\n    <fieldset>\n      <div class=\"control-group\">\n        <label class=\"control-label\">\n          <strong>\n            <i class=\'yellow text-shadowed icon-warning-sign\'></i> Reset settings\n          </strong>\n        </label>\n        <div class=\"controls\">\n          <button class=\"btn btn-danger\" ng-click=\"doReset()\">Reset to defaults</button>\n          <span class=\"help-block\">Wipe settings stored by {{branding.appName}} in your browser\'s local storage</span>\n        </div>\n      </div>\n    </fieldset>\n  </form>\n</div>\n");}]); hawtioPluginLoader.addModule("hawtio-preferences-templates");
