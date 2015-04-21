@@ -286,7 +286,8 @@ var HawtioPreferences;
             $scope.names = sortNames(_.keys(panels));
             Core.$apply($scope);
         });
-        Core.bindModelToSearchParam($scope, $location, "pref", "pref", 'Reset');
+        // pick the first one as the default
+        Core.bindModelToSearchParam($scope, $location, "pref", "pref", $scope.names[0]);
         $scope.setPanel = function (name) {
             $scope.pref = name;
         };

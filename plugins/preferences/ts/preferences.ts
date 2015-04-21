@@ -27,7 +27,8 @@ module HawtioPreferences {
       Core.$apply($scope);
     });
 
-    Core.bindModelToSearchParam($scope, $location, "pref", "pref", 'Reset');
+    // pick the first one as the default
+    Core.bindModelToSearchParam($scope, $location, "pref", "pref", $scope.names[0]);
 
     $scope.setPanel = (name) => {
       $scope.pref = name;
