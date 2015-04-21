@@ -280,10 +280,10 @@ var HawtioPreferences;
     }]);
     HawtioPreferences._module.controller("HawtioPreferences.PreferencesController", ["$scope", "$location", "preferencesRegistry", "PreferencesLastPath", function ($scope, $location, preferencesRegistry, last) {
         var panels = preferencesRegistry.getTabs();
-        $scope.names = _.keys(panels);
+        $scope.names = sortNames(_.keys(panels));
         $scope.$watch(function () {
             panels = preferencesRegistry.getTabs();
-            $scope.names = _.keys(panels);
+            $scope.names = sortNames(_.keys(panels));
             Core.$apply($scope);
         });
         Core.bindModelToSearchParam($scope, $location, "pref", "pref", 'Reset');
@@ -307,6 +307,22 @@ var HawtioPreferences;
             }
             return undefined;
         };
+        /**
+         * Sort the preference by names (and ensure Reset is last).
+         * @param names  the names
+         * @returns {any} the sorted names
+         */
+        function sortNames(names) {
+            return names.sort(function (a, b) {
+                if ("Reset" == a) {
+                    return 1;
+                }
+                else if ("Reset" == b) {
+                    return -1;
+                }
+                return a.localeCompare(b);
+            });
+        }
     }]);
 })(HawtioPreferences || (HawtioPreferences = {}));
 
