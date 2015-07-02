@@ -152,36 +152,35 @@ var HawtioPreferences;
 /// <reference path="preferenceHelpers.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
-    HawtioPreferences._module.factory("ChildLoggers", ["SchemaRegistry", function (schemas) {
-        var allLoggers = Logger['loggers'];
-        var allLoggersEnum = _.keys(allLoggers);
-        var theEnum = {};
-        _.forIn(allLoggers, function (value, key) {
-            theEnum[key] = key;
-        });
-        return theEnum;
-    }]);
-    HawtioPreferences._module.run(["ChildLoggers", "SchemaRegistry", function (loggers, schemas) {
+    HawtioPreferences._module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "SchemaRegistry", function ($scope, schemas) {
+        function getLoggers() {
+            var allLoggers = Logger['loggers'];
+            var allLoggersEnum = _.keys(allLoggers);
+            var theEnum = {};
+            _.forIn(allLoggers, function (value, key) {
+                theEnum[key] = key;
+            });
+            return theEnum;
+        }
+        var levelEnum = {
+            Off: 'OFF',
+            Error: 'ERROR',
+            Warn: 'WARN',
+            Info: 'INFO',
+            Debug: 'DEBUG'
+        };
         schemas.addSchema('ChildLoggers', {
             properties: {
                 logger: {
                     type: "string",
-                    enum: loggers
+                    enum: getLoggers()
                 },
                 level: {
                     type: 'string',
-                    enum: {
-                        Off: 'OFF',
-                        Error: 'ERROR',
-                        Warn: 'WARN',
-                        Info: 'INFO',
-                        Debug: 'DEBUG'
-                    }
+                    enum: levelEnum
                 }
             }
         });
-    }]);
-    HawtioPreferences._module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "ChildLoggers", function ($scope, loggers) {
         var config = {
             properties: {
                 logBuffer: {
@@ -191,13 +190,7 @@ var HawtioPreferences;
                 },
                 globalLogLevel: {
                     type: 'string',
-                    enum: {
-                        Off: 'OFF',
-                        Error: 'ERROR',
-                        Warn: 'WARN',
-                        Info: 'INFO',
-                        Debug: 'DEBUG'
-                    },
+                    enum: levelEnum,
                 },
                 childLoggers: {
                     type: 'array',

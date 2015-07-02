@@ -2,38 +2,38 @@
 /// <reference path="preferenceHelpers.ts"/>
 module HawtioPreferences {
 
-  _module.factory("ChildLoggers", ["SchemaRegistry", (schemas) => {
-    var allLoggers = Logger['loggers'];
-    var allLoggersEnum = _.keys(allLoggers);
-    var theEnum = {};
-    _.forIn(allLoggers, (value, key) => {
-      theEnum[key] = key;
-    });
-    return theEnum;
-  }]);
+  _module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "SchemaRegistry", ($scope, schemas) => {
 
-  _module.run(["ChildLoggers", "SchemaRegistry", (loggers, schemas) => {
+    function getLoggers() {
+      var allLoggers = Logger['loggers'];
+      var allLoggersEnum = _.keys(allLoggers);
+      var theEnum = {};
+      _.forIn(allLoggers, (value, key) => {
+        theEnum[key] = key;
+      });
+      return theEnum;
+    }
+
+    var levelEnum = {
+      Off: 'OFF',
+      Error: 'ERROR',
+      Warn: 'WARN',
+      Info: 'INFO',
+      Debug: 'DEBUG'
+    };
+
     schemas.addSchema('ChildLoggers', {
       properties: {
         logger: {
           type: "string",
-          enum: loggers
+          enum: getLoggers()
         },
         level: {
           type: 'string',
-          enum: {
-            Off: 'OFF',
-            Error: 'ERROR',
-            Warn: 'WARN',
-            Info: 'INFO',
-            Debug: 'DEBUG'
-          }
+          enum: levelEnum
         }
       }
     });
-  }]);
-
-  _module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "ChildLoggers", ($scope, loggers) => {
 
     var config = {
       properties: {
@@ -44,13 +44,7 @@ module HawtioPreferences {
         },
         globalLogLevel: {
           type: 'string',
-          enum: {
-            Off: 'OFF',
-            Error: 'ERROR',
-            Warn: 'WARN',
-            Info: 'INFO',
-            Debug: 'DEBUG'
-          },
+          enum: levelEnum,
         },
         childLoggers: {
           type: 'array',
