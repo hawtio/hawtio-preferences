@@ -2,12 +2,12 @@ var gulp = require('gulp'),
     wiredep = require('wiredep').stream,
     eventStream = require('event-stream'),
     gulpLoadPlugins = require('gulp-load-plugins'),
-    map = require('vinyl-map'),
     fs = require('fs'),
     path = require('path'),
-    uri = require('URIjs'),
+    uri = require('urijs'),
     s = require('underscore.string'),
-    hawtio = require('hawtio-node-backend');
+    hawtio = require('hawtio-node-backend'),
+    del = require('del');
 
 var plugins = gulpLoadPlugins({});
 var pkg = require('./package.json');
@@ -36,18 +36,12 @@ gulp.task('bower', function() {
 /** Adjust the reference path of any typescript-built plugin this project depends on */
 gulp.task('path-adjust', function() {
   return gulp.src('libs/**/includes.d.ts')
-    .pipe(map(function(buf, filename) {
-      var textContent = buf.toString();
-      var newTextContent = textContent.replace(/"\.\.\/libs/gm, '"../../../libs');
-      // console.log("Filename: ", filename, " old: ", textContent, " new:", newTextContent);
-      return newTextContent;
-    }))
+    .pipe(plugins.replace(/"\.\.\/libs/gm, '"../../../libs'))
     .pipe(gulp.dest('libs'));
 });
 
 gulp.task('clean-defs', function() {
-  return gulp.src('defs.d.ts', { read: false })
-    .pipe(plugins.clean());
+  return del('defs.d.ts');
 });
 
 gulp.task('tsc', ['clean-defs'], function() {
@@ -65,14 +59,13 @@ gulp.task('tsc', ['clean-defs'], function() {
         .pipe(gulp.dest('.')),
       tsResult.dts
         .pipe(gulp.dest('d.ts')))
-        .pipe(map(function(buf, filename) {
-          if (!s.endsWith(filename, 'd.ts')) {
-            return buf;
-          }
-          var relative = path.relative(cwd, filename);
-          fs.appendFileSync('defs.d.ts', '/// <reference path="' + relative + '"/>\n');
-          return buf;
-        }));
+        .pipe(plugins.filter('**/*.d.ts'))
+        .pipe(plugins.concatFilenames('defs.d.ts', {
+          root: cwd,
+          prepend: '/// <reference path="',
+          append: '"/>'
+        }))
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('template', ['tsc'], function() {
@@ -94,8 +87,7 @@ gulp.task('concat', ['template'], function() {
 });
 
 gulp.task('clean', ['concat'], function() {
-  return gulp.src(['templates.js', 'compiled.js'], { read: false })
-    .pipe(plugins.clean());
+  return del(['templates.js', 'compiled.js']);
 });
 
 gulp.task('watch', ['build'], function() {
@@ -118,7 +110,7 @@ gulp.task('connect', ['watch'], function() {
   hawtio.setConfig({
     port: 2772,
     staticProxies: [
-    /*  
+    /*
     // proxy to a service, in this case kubernetes
     {
       proto: kube.protocol(),
@@ -140,7 +132,7 @@ gulp.task('connect', ['watch'], function() {
     staticAssets: [{
       path: '/',
       dir: '.'
-   
+
     }],
     fallback: 'index.html',
     liveReload: {
@@ -176,4 +168,4 @@ gulp.task('build', ['bower', 'path-adjust', 'tsc', 'template', 'concat', 'clean'
 gulp.task('default', ['connect']);
 
 
-    
+
