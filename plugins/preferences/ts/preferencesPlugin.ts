@@ -13,7 +13,7 @@ module HawtioPreferences {
 
   _module.run(['$templateCache', 'HawtioExtension', '$compile', 'preferencesRegistry', ($templateCache:ng.ITemplateCacheService, ext, $compile:ng.ICompileService, preferencesRegistry) => {
     ext.add('hawtio-user', ($scope) => {
-      var template = $templateCache.get(UrlHelpers.join(templatePath, 'menuItem.html'));
+      var template = $templateCache.get<string>(UrlHelpers.join(templatePath, 'menuItem.html'));
       return $compile(template)($scope);
     });
     log.debug("loaded");

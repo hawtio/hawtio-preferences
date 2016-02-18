@@ -40,7 +40,7 @@ gulp.task('path-adjust', function() {
     .pipe(gulp.dest('libs'));
 });
 
-gulp.task('clean-defs', function() {
+gulp.task('clean-defs', ['path-adjust'], function() {
   return del('defs.d.ts');
 });
 
