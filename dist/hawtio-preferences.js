@@ -257,6 +257,22 @@ var HawtioPreferences;
             lastTab: undefined
         };
     });
+    HawtioPreferences._module.service('HawtioPreferences', ['PreferencesLastPath', '$location', '$rootScope', function (last, $location, $rootScope) {
+            var self = {
+                goto: function (pref) {
+                    if (pref === void 0) { pref = undefined; }
+                    var search = {};
+                    if (pref) {
+                        search['pref'] = pref;
+                    }
+                    last.lastPath = $location.path();
+                    last.lastSearch = $location.search();
+                    $location.path('/preferences').search({});
+                    Core.$apply($rootScope);
+                }
+            };
+            return self;
+        }]);
     HawtioPreferences._module.controller('HawtioPreferences.MenuItemController', ['$scope', '$location', 'PreferencesLastPath', function ($scope, $location, last) {
             $scope.gotoPreferences = function () {
                 last.lastPath = $location.path();

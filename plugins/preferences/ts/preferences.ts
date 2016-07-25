@@ -8,6 +8,22 @@ module HawtioPreferences {
     };
   });
 
+  _module.service('HawtioPreferences', ['PreferencesLastPath', '$location', '$rootScope', (last, $location, $rootScope) => {
+    var self = {
+      goto: (pref = undefined) => {
+        var search = {};
+        if (pref) {
+          search['pref'] = pref;
+        }
+        last.lastPath = $location.path();
+        last.lastSearch = $location.search();
+        $location.path('/preferences').search({});
+        Core.$apply($rootScope);
+      }
+    };
+    return self;
+  }]);
+
   _module.controller('HawtioPreferences.MenuItemController', ['$scope', '$location', 'PreferencesLastPath', ($scope, $location:ng.ILocationService, last) => {
     $scope.gotoPreferences = () => {
       last.lastPath = $location.path();
