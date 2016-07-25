@@ -17,7 +17,7 @@ module HawtioPreferences {
         }
         last.lastPath = $location.path();
         last.lastSearch = $location.search();
-        $location.path('/preferences').search({});
+        $location.path('/preferences').search(search);
         Core.$apply($rootScope);
       }
     };
