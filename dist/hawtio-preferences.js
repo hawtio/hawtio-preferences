@@ -113,7 +113,7 @@ var HawtioPreferences;
             return answer;
         };
         return PreferencesRegistry;
-    })();
+    }());
     HawtioPreferences.PreferencesRegistry = PreferencesRegistry;
     ;
 })(HawtioPreferences || (HawtioPreferences = {}));
