@@ -2,29 +2,33 @@ var gulp = require('gulp'),
     wiredep = require('wiredep').stream,
     eventStream = require('event-stream'),
     gulpLoadPlugins = require('gulp-load-plugins'),
+    del = require('del'),
     fs = require('fs'),
     path = require('path'),
     uri = require('urijs'),
     s = require('underscore.string'),
-    hawtio = require('hawtio-node-backend'),
-    del = require('del');
+    argv = require('yargs').argv,
+    logger = require('js-logger'),
+    hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
 var pkg = require('./package.json');
 
 var config = {
+  logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   main: '.',
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html'],
   templateModule: pkg.name + '-templates',
-  dist: './dist/',
+  dist: argv.out || './dist/',
   js: pkg.name + '.js',
   tsProject: plugins.typescript.createProject({
     target: 'ES5',
     module: 'commonjs',
     declarationFiles: true,
     noExternalResolve: false
-  })
+  }),
+  sourceMap: argv.sourcemap
 };
 
 gulp.task('bower', function() {
@@ -47,6 +51,7 @@ gulp.task('clean-defs', ['path-adjust'], function() {
 gulp.task('tsc', ['clean-defs'], function() {
   var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
+    .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
     .pipe(plugins.typescript(config.tsProject))
     .on('error', plugins.notify.onError({
       message: '#{ error.message }',
@@ -56,6 +61,7 @@ gulp.task('tsc', ['clean-defs'], function() {
     return eventStream.merge(
       tsResult.js
         .pipe(plugins.concat('compiled.js'))
+      .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
         .pipe(gulp.dest('.')),
       tsResult.dts
         .pipe(gulp.dest('d.ts')))
@@ -108,6 +114,7 @@ gulp.task('connect', ['watch'], function() {
   */
 
   hawtio.setConfig({
+    logLevel: config.logLevel,
     port: 2772,
     staticProxies: [
     /*
@@ -143,11 +150,15 @@ gulp.task('connect', ['watch'], function() {
           var path = req.originalUrl;
           // avoid returning these files, they should get pulled from js
           if (s.startsWith(path, '/plugins/') && s.endsWith(path, 'html')) {
-            //console.log("returning 404 for: ", path);
+            if (argv.debug) {
+              console.log("returning 404 for: ", path);
+            }
             res.statusCode = 404;
             res.end();
           } else {
-            //console.log("allowing: ", path);
+            if (argv.debug) {
+              console.log("allowing: ", path);
+            }
             next();
           }
         });
