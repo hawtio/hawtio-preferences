@@ -1,4 +1,4 @@
-## hawtio-preferences
+## hawtio-preferences [![CircleCI](https://circleci.com/gh/hawtio/hawtio-preferences.svg?style=svg)](https://circleci.com/gh/hawtio/hawtio-preferences)
 
 This plugin provides preferences functionality for hawtio, allowing custom plugins to register their own preference, which are then shown from the user preference menu.
 
