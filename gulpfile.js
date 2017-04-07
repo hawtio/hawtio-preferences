@@ -48,7 +48,7 @@ gulp.task('clean-defs', function() {
   return del('defs.d.ts');
 });
 
-gulp.task('tsc', ['clean-defs'], function() {
+gulp.task('_tsc', ['clean-defs'], function() {
   var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
     .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
@@ -73,8 +73,9 @@ gulp.task('tsc', ['clean-defs'], function() {
     }))
     .pipe(gulp.dest('.'));
 });
+gulp.task('tsc', ['path-adjust'], function() { gulp.start('_tsc'); });
 
-gulp.task('template', ['tsc'], function() {
+gulp.task('_template', ['_tsc'], function() {
   return gulp.src(config.templates)
     .pipe(plugins.angularTemplatecache({
       filename: 'templates.js',
@@ -85,23 +86,26 @@ gulp.task('template', ['tsc'], function() {
     }))
     .pipe(gulp.dest('.'));
 });
+gulp.task('template', ['tsc'], function() { gulp.start('_template'); });
 
-gulp.task('concat', ['template'], function() {
+gulp.task('_concat', ['_template'], function() {
   return gulp.src(['compiled.js', 'templates.js'])
     .pipe(plugins.concat(config.js))
     .pipe(gulp.dest(config.dist));
 });
+gulp.task('concat', ['template'], function() { gulp.start('_concat'); });
 
-gulp.task('clean', ['concat'], function() {
+gulp.task('_clean', ['_concat'], function() {
   return del(['templates.js', 'compiled.js']);
 });
+gulp.task('clean', ['concat'], function() { gulp.start('_clean'); });
 
 gulp.task('watch', ['build'], function() {
   plugins.watch(['libs/**/*.js', 'libs/**/*.css', 'index.html', 'dist/*.js'], function() {
     gulp.start('reload');
   });
   plugins.watch(['libs/**/*.d.ts', config.ts, config.templates], function() {
-    gulp.start(['tsc', 'template', 'concat', 'clean']);
+    gulp.start(['_tsc', '_template', '_concat', '_clean']);
   });
 });
 
