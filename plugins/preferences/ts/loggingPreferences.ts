@@ -30,7 +30,8 @@ module HawtioPreferences {
         },
         level: {
           type: 'string',
-          enum: levelEnum
+          enum: levelEnum,
+          description: 'Level of logging for the child logger'
         }
       }
     });
@@ -45,6 +46,7 @@ module HawtioPreferences {
         globalLogLevel: {
           type: 'string',
           enum: levelEnum,
+          description: 'Level of logging for the logging console'
         },
         childLoggers: {
           type: 'array',
