@@ -19,5 +19,5 @@ declare module HawtioPreferences {
      * @param {string} perspectiveId
      * @return {Boolean}
      */
-    function isValidFunction(workspace: any, validFn: any, perspectiveId: any): any;
+    function isValidFunction(workspace: any, validFn: any, perspectiveId: string): boolean;
 }

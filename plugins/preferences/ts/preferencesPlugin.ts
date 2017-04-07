@@ -6,12 +6,12 @@ module HawtioPreferences {
   // preference registry service that plugins can register preference pages to
   _module.config(['$provide', '$routeProvider', ($provide, $routeProvider) => {
     $routeProvider.when('/preferences', { templateUrl: UrlHelpers.join(templatePath, 'preferences.html'), reloadOnSearch: false });
-    $provide.decorator('preferencesRegistry', ['$delegate', '$rootScope', ($delegate, $rootScope) => {
+    $provide.decorator('preferencesRegistry', ['$delegate', '$rootScope', ($delegate, $rootScope:ng.IRootScopeService) => {
       return new HawtioPreferences.PreferencesRegistry($rootScope);
     }]);
   }]);
 
-  _module.run(['$templateCache', 'HawtioExtension', '$compile', 'preferencesRegistry', ($templateCache:ng.ITemplateCacheService, ext, $compile:ng.ICompileService, preferencesRegistry) => {
+  _module.run(['$templateCache', 'HawtioExtension', '$compile', 'preferencesRegistry', ($templateCache:ng.ITemplateCacheService, ext, $compile:ng.ICompileService, preferencesRegistry:PreferencesRegistry) => {
     ext.add('hawtio-user', ($scope) => {
       var template = $templateCache.get<string>(UrlHelpers.join(templatePath, 'menuItem.html'));
       return $compile(template)($scope);

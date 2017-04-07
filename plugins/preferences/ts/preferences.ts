@@ -8,7 +8,7 @@ module HawtioPreferences {
     };
   });
 
-  _module.service('HawtioPreferences', ['PreferencesLastPath', '$location', '$rootScope', (last, $location, $rootScope) => {
+  _module.service('HawtioPreferences', ['PreferencesLastPath', '$location', '$rootScope', (last, $location:ng.ILocationService, $rootScope:ng.IRootScopeService) => {
     var self = {
       goto: (pref = undefined) => {
         var search = {};
@@ -33,7 +33,7 @@ module HawtioPreferences {
     }
   }]);
 
-  _module.controller("HawtioPreferences.PreferencesController", ["$scope", "$location", "preferencesRegistry", "PreferencesLastPath", ($scope, $location, preferencesRegistry, last) => {
+  _module.controller("HawtioPreferences.PreferencesController", ["$scope", "$location", "preferencesRegistry", "PreferencesLastPath", ($scope, $location:ng.ILocationService, preferencesRegistry:PreferencesRegistry, last) => {
     var panels = preferencesRegistry.getTabs();
     $scope.names = sortNames(_.keys(panels));
 

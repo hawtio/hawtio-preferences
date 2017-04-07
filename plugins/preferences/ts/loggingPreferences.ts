@@ -2,7 +2,7 @@
 /// <reference path="preferenceHelpers.ts"/>
 module HawtioPreferences {
 
-  _module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "SchemaRegistry", ($scope, schemas) => {
+  _module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "SchemaRegistry", ($scope, schemas:HawtioForms.SchemaRegistry) => {
 
     function getLoggers() {
       var allLoggers = Logger['loggers'];

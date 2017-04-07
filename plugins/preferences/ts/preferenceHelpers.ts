@@ -77,7 +77,7 @@ module HawtioPreferences {
    * @param {string} perspectiveId
    * @return {Boolean}
    */
-  export function isValidFunction(workspace, validFn, perspectiveId) {
+  export function isValidFunction(workspace, validFn, perspectiveId:string):boolean {
     return !validFn || validFn(workspace, perspectiveId);
   }
 
