@@ -1,5 +1,5 @@
 /// <reference path="preferencesPlugin.ts"/>
- module HawtioPreferences {
+module HawtioPreferences {
   _module.controller("HawtioPreferences.ResetPreferences", ["$scope", "localStorage", ($scope, localStorage) => {
     $scope.doReset = () => {
       log.info("Resetting");
@@ -12,4 +12,4 @@
       doReset();
     };
   }]);
- }
+}

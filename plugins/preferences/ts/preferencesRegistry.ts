@@ -1,5 +1,5 @@
 /// <reference path="../../includes.ts"/>
- module HawtioPreferences {
+module HawtioPreferences {
 
   export class PreferencesRegistry {
 
