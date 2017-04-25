@@ -24,8 +24,8 @@ var config = {
   js: pkg.name + '.js',
   tsProject: plugins.typescript.createProject({
     target: 'ES5',
-    module: 'commonjs',
-    declarationFiles: true,
+    outFile: 'compiled.js',
+    declaration: true,
     noResolve: false
   }),
   sourceMap: argv.sourcemap
@@ -57,27 +57,20 @@ gulp.task('_tsc', ['clean-defs'], function() {
   var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
     .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
-    .pipe(plugins.typescript(config.tsProject))
+    .pipe(config.tsProject())
     .on('error', plugins.notify.onError({
       message: '#{ error.message }',
-      title: 'Typescript compilation error'
-    }));
+      title: 'Typescript compilation error'}));
 
   return eventStream.merge(
     tsResult.js
-      .pipe(plugins.concat('compiled.js'))
       .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
       .pipe(gulp.dest('.')),
     tsResult.dts
-      .pipe(gulp.dest('d.ts')))
-    .pipe(plugins.filter('**/*.d.ts'))
-    .pipe(plugins.concatFilenames('defs.d.ts', {
-      root: cwd,
-      prepend: '/// <reference path="',
-      append: '"/>'
-    }))
-    .pipe(gulp.dest('.'));
+      .pipe(plugins.rename('defs.d.ts'))
+      .pipe(gulp.dest('.')));
 });
+
 gulp.task('tsc', ['path-adjust'], function() { gulp.start('_tsc'); });
 
 gulp.task('_template', ['_tsc'], function() {
@@ -185,6 +178,3 @@ gulp.task('reload', function() {
 gulp.task('build', ['bower', 'path-adjust', 'tsc', 'template', 'concat', 'clean']);
 
 gulp.task('default', ['connect']);
-
-
-
