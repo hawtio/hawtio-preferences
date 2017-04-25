@@ -28,7 +28,6 @@
     "hawtio-core-dts": "~3.0.0"
   },
   "resolutions": {
-    "jquery": ">=1.6",
-    "lodash": "4.x"
+    "jquery": ">=1.6"
   }
 }
