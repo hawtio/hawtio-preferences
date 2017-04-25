@@ -1,6 +1,5 @@
 /// <reference path="../libs/hawtio-utilities/defs.d.ts"/>
 /// <reference path="../libs/hawtio-forms/defs.d.ts"/> 
-
 /// <reference path="../../includes.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
@@ -80,7 +79,6 @@ var HawtioPreferences;
     }
     HawtioPreferences.isValidFunction = isValidFunction;
 })(HawtioPreferences || (HawtioPreferences = {}));
-
 /// <reference path="../../includes.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
@@ -118,7 +116,6 @@ var HawtioPreferences;
     HawtioPreferences.PreferencesRegistry = PreferencesRegistry;
     ;
 })(HawtioPreferences || (HawtioPreferences = {}));
-
 /// <reference path="preferenceHelpers.ts"/>
 /// <reference path="preferencesRegistry.ts"/>
 var HawtioPreferences;
@@ -142,7 +139,6 @@ var HawtioPreferences;
         }]);
     hawtioPluginLoader.addModule(HawtioPreferences.pluginName);
 })(HawtioPreferences || (HawtioPreferences = {}));
-
 /// <reference path="preferencesPlugin.ts"/>
 /// <reference path="preferenceHelpers.ts"/>
 var HawtioPreferences;
@@ -250,7 +246,6 @@ var HawtioPreferences;
             });
         }]);
 })(HawtioPreferences || (HawtioPreferences = {}));
-
 /// <reference path="preferencesPlugin.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
@@ -332,7 +327,6 @@ var HawtioPreferences;
             }
         }]);
 })(HawtioPreferences || (HawtioPreferences = {}));
-
 /// <reference path="preferencesPlugin.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
