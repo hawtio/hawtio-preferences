@@ -4,7 +4,8 @@
     "hawtio"
   ],
   "main": [
-    "dist/hawtio-preferences.js"
+    "dist/hawtio-preferences.js",
+    "dist/hawtio-preferences.css"
   ],
   "ignore": [
     "**/.*",

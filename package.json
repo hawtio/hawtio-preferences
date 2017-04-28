@@ -21,6 +21,7 @@
     "gulp-concat-filenames": "^1.0.0",
     "gulp-filter": "^3.0.1",
     "gulp-if": "^2.0.2",
+    "gulp-less": "^3.0.0",
     "gulp-load-plugins": "^0.8.0",
     "gulp-notify": "^2.1.0",
     "gulp-rename": "^1.0.0",

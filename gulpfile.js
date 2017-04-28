@@ -18,10 +18,12 @@ var config = {
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   main: '.',
   ts: ['plugins/**/*.ts'],
+  less: ['plugins/**/*.less'],
   templates: ['plugins/**/*.html'],
   templateModule: pkg.name + '-templates',
   dist: argv.out || './dist/',
   js: pkg.name + '.js',
+  css: pkg.name + '.css',
   tsProject: plugins.typescript.createProject({
     target: 'ES5',
     outFile: 'compiled.js',
@@ -73,6 +75,20 @@ gulp.task('_tsc', ['clean-defs'], function() {
 
 gulp.task('tsc', ['path-adjust'], function() { gulp.start('_tsc'); });
 
+gulp.task('less', function () {
+  return gulp.src(config.less)
+    .pipe(plugins.less({
+      paths: [path.join(__dirname, 'plugins'), path.join(__dirname, 'libs')]
+    }))
+    .on('error', plugins.notify.onError({
+      onLast: true,
+      message: '<%= error.message %>',
+      title: 'less file compilation error'
+    }))
+    .pipe(plugins.concat(config.css))
+    .pipe(gulp.dest(config.dist));
+});
+
 gulp.task('_template', ['_tsc'], function() {
   return gulp.src(config.templates)
     .pipe(plugins.angularTemplatecache({
@@ -84,6 +100,7 @@ gulp.task('_template', ['_tsc'], function() {
     }))
     .pipe(gulp.dest('.'));
 });
+
 gulp.task('template', ['tsc'], function() { gulp.start('_template'); });
 
 gulp.task('_concat', ['_template'], function() {
@@ -91,14 +108,22 @@ gulp.task('_concat', ['_template'], function() {
     .pipe(plugins.concat(config.js))
     .pipe(gulp.dest(config.dist));
 });
+
 gulp.task('concat', ['template'], function() { gulp.start('_concat'); });
 
 gulp.task('_clean', ['_concat'], function() {
   return del(['templates.js', 'compiled.js']);
 });
+
 gulp.task('clean', ['concat'], function() { gulp.start('_clean'); });
 
-gulp.task('watch', ['build'], function() {
+gulp.task('watch-less', function() {
+  plugins.watch(config.less, function() {
+    gulp.start('less');
+  });
+});
+
+gulp.task('watch', ['build', 'watch-less'], function() {
   plugins.watch(['libs/**/*.js', 'libs/**/*.css', 'index.html', 'dist/*.js'], function() {
     gulp.start('reload');
   });
@@ -108,35 +133,9 @@ gulp.task('watch', ['build'], function() {
 });
 
 gulp.task('connect', ['watch'], function() {
-  /*
-   * Example of fetching a URL from the environment, in this case for kubernetes
-  var kube = uri(process.env.KUBERNETES_MASTER || 'http://localhost:8080');
-  console.log("Connecting to Kubernetes on: " + kube);
-  */
-
   hawtio.setConfig({
     logLevel: config.logLevel,
     port: 2772,
-    staticProxies: [
-    /*
-    // proxy to a service, in this case kubernetes
-    {
-      proto: kube.protocol(),
-      port: kube.port(),
-      hostname: kube.hostname(),
-      path: '/services/kubernetes',
-      targetPath: kube.path()
-    },
-    // proxy to a jolokia instance
-    {
-      proto: kube.protocol(),
-      hostname: kube.hostname(),
-      port: kube.port(),
-      path: '/jolokia',
-      targetPath: '/hawtio/jolokia'
-    }
-    */
-    ],
     staticAssets: [{
       path: '/',
       dir: '.'
@@ -175,6 +174,6 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('build', ['bower', 'path-adjust', 'tsc', 'template', 'concat', 'clean']);
+gulp.task('build', ['bower', 'path-adjust', 'tsc', 'less', 'template', 'concat', 'clean']);
 
 gulp.task('default', ['connect']);
