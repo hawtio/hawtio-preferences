@@ -1,5 +1,4 @@
 var gulp = require('gulp'),
-    wiredep = require('wiredep').stream,
     eventStream = require('event-stream'),
     gulpLoadPlugins = require('gulp-load-plugins'),
     del = require('del'),
@@ -12,84 +11,48 @@ var gulp = require('gulp'),
     hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
-var pkg = require('./package.json');
 
 var config = {
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
-  main: '.',
   ts: ['plugins/**/*.ts'],
   less: ['plugins/**/*.less'],
   templates: ['plugins/**/*.html'],
-  templateModule: pkg.name + '-templates',
+  templateModule: 'hawtio-preferences-templates',
   dist: argv.out || './dist/',
-  js: pkg.name + '.js',
-  css: pkg.name + '.css',
-  tsProject: plugins.typescript.createProject({
-    target: 'ES5',
-    outFile: 'compiled.js',
-    declaration: true,
-    noResolve: false
-  }),
+  js: 'hawtio-preferences.js',
+  css: 'hawtio-preferences.css',
+  tsProject: plugins.typescript.createProject('tsconfig.json'),
   sourceMap: argv.sourcemap
 };
 
-gulp.task('bower', function() {
-  return gulp.src('index.html')
-    .pipe(wiredep({}))
-    .pipe(gulp.dest('.'));
-});
-
-/** Adjust the reference path of any typescript-built plugin this project depends on */
-gulp.task('path-adjust', function() {
-return eventStream.merge(
-    gulp.src('libs/**/includes.d.ts')
-      .pipe(plugins.replace(/"\.\.\/libs/gm, '"../../../libs'))
-      .pipe(gulp.dest('libs')),
-    gulp.src('libs/**/defs.d.ts')
-      .pipe(plugins.replace(/"libs/gm, '"../../libs'))
-      .pipe(gulp.dest('libs'))
-  );
-});
-
 gulp.task('clean-defs', function() {
-  return del('defs.d.ts');
+  return del(config.dist + '*.d.ts');
 });
 
-gulp.task('_tsc', ['clean-defs'], function() {
-  var cwd = process.cwd();
+gulp.task('tsc', ['clean-defs'], function() {
   var tsResult = gulp.src(config.ts)
     .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
-    .pipe(config.tsProject())
-    .on('error', plugins.notify.onError({
-      message: '#{ error.message }',
-      title: 'Typescript compilation error'}));
+    .pipe(config.tsProject());
 
   return eventStream.merge(
     tsResult.js
       .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
       .pipe(gulp.dest('.')),
     tsResult.dts
-      .pipe(plugins.rename('defs.d.ts'))
-      .pipe(gulp.dest('.')));
+      .pipe(plugins.rename('hawtio-preferences.d.ts'))
+      .pipe(gulp.dest(config.dist)));
 });
-
-gulp.task('tsc', ['path-adjust'], function() { gulp.start('_tsc'); });
 
 gulp.task('less', function () {
   return gulp.src(config.less)
     .pipe(plugins.less({
-      paths: [path.join(__dirname, 'plugins'), path.join(__dirname, 'libs')]
-    }))
-    .on('error', plugins.notify.onError({
-      onLast: true,
-      message: '<%= error.message %>',
-      title: 'less file compilation error'
+      paths: [path.join(__dirname, 'plugins')]
     }))
     .pipe(plugins.concat(config.css))
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('_template', ['_tsc'], function() {
+gulp.task('template', ['tsc'], function() {
   return gulp.src(config.templates)
     .pipe(plugins.angularTemplatecache({
       filename: 'templates.js',
@@ -101,35 +64,23 @@ gulp.task('_template', ['_tsc'], function() {
     .pipe(gulp.dest('.'));
 });
 
-gulp.task('template', ['tsc'], function() { gulp.start('_template'); });
-
-gulp.task('_concat', ['_template'], function() {
+gulp.task('concat', ['template'], function() {
   return gulp.src(['compiled.js', 'templates.js'])
     .pipe(plugins.concat(config.js))
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('concat', ['template'], function() { gulp.start('_concat'); });
-
-gulp.task('_clean', ['_concat'], function() {
+gulp.task('clean', ['concat'], function() {
   return del(['templates.js', 'compiled.js']);
 });
 
-gulp.task('clean', ['concat'], function() { gulp.start('_clean'); });
-
 gulp.task('watch-less', function() {
-  plugins.watch(config.less, function() {
-    gulp.start('less');
-  });
+  gulp.watch(config.less, ['less']);
 });
 
 gulp.task('watch', ['build', 'watch-less'], function() {
-  plugins.watch(['libs/**/*.js', 'libs/**/*.css', 'index.html', 'dist/*.js'], function() {
-    gulp.start('reload');
-  });
-  plugins.watch(['libs/**/*.d.ts', config.ts, config.templates], function() {
-    gulp.start(['_tsc', '_template', '_concat', '_clean']);
-  });
+  gulp.watch(['index.html', 'dist/*.js'], ['reload']);
+  gulp.watch([config.ts, config.templates], ['tsc', 'template', 'concat', 'clean']);
 });
 
 gulp.task('connect', ['watch'], function() {
@@ -174,6 +125,6 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('build', ['bower', 'path-adjust', 'tsc', 'less', 'template', 'concat', 'clean']);
+gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean']);
 
 gulp.task('default', ['connect']);

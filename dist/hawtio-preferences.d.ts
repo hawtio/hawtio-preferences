@@ -1,5 +1,4 @@
-/// <reference path="libs/hawtio-utilities/defs.d.ts" />
-/// <reference path="libs/hawtio-forms/defs.d.ts" />
+/// <reference types="angular" />
 declare module HawtioPreferences {
     var pluginName: string;
     var templatePath: string;
@@ -33,7 +32,7 @@ declare module HawtioPreferences {
     }
 }
 declare module HawtioPreferences {
-    var _module: ng.IModule;
+    var _module: angular.IModule;
 }
 declare module HawtioPreferences {
 }

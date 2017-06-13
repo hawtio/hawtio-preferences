@@ -1,6 +1,3 @@
-/// <reference path="../libs/hawtio-utilities/defs.d.ts"/>
-/// <reference path="../libs/hawtio-forms/defs.d.ts"/> 
-/// <reference path="../../includes.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
     HawtioPreferences.pluginName = 'hawtio-preferences';
@@ -79,7 +76,6 @@ var HawtioPreferences;
     }
     HawtioPreferences.isValidFunction = isValidFunction;
 })(HawtioPreferences || (HawtioPreferences = {}));
-/// <reference path="../../includes.ts"/>
 var HawtioPreferences;
 (function (HawtioPreferences) {
     var PreferencesRegistry = (function () {
@@ -114,7 +110,6 @@ var HawtioPreferences;
         return PreferencesRegistry;
     }());
     HawtioPreferences.PreferencesRegistry = PreferencesRegistry;
-    ;
 })(HawtioPreferences || (HawtioPreferences = {}));
 /// <reference path="preferenceHelpers.ts"/>
 /// <reference path="preferencesRegistry.ts"/>

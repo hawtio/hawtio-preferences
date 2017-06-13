@@ -1,4 +1,3 @@
-/// <reference path="../../includes.ts"/>
 module HawtioPreferences {
 
   export class PreferencesRegistry {
@@ -34,6 +33,7 @@ module HawtioPreferences {
       });
       return answer;
     }
-  };
-}
+    
+  }
 
+}

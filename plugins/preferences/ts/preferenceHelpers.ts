@@ -1,5 +1,5 @@
-/// <reference path="../../includes.ts"/>
 module HawtioPreferences {
+
   export var pluginName = 'hawtio-preferences';
   export var templatePath = 'plugins/preferences/html';
   export var log = Logger.get(pluginName);
