@@ -1,34 +1,49 @@
-## hawtio-preferences [![CircleCI](https://circleci.com/gh/hawtio/hawtio-preferences.svg?style=svg)](https://circleci.com/gh/hawtio/hawtio-preferences)
+# hawtio-preferences
+
+[![CircleCI](https://circleci.com/gh/hawtio/hawtio-preferences.svg?style=svg)](https://circleci.com/gh/hawtio/hawtio-preferences)
 
 This plugin provides preferences functionality for hawtio, allowing custom plugins to register their own preference, which are then shown from the user preference menu.
 
-### Basic usage
+## Installation
 
-#### Running this plugin locally
+```
+yarn add @hawtio/preferences
+```
 
-First clone the source
+## Set up development environment
 
-    git clone https://github.com/hawtio/hawtio-preferences
-    cd hawtio-preferences
+### Clone the repository
 
-Next you'll need to [install NodeJS](http://nodejs.org/download/) and then install the default global npm dependencies:
+```
+git clone https://github.com/hawtio/hawtio-preferences
+cd hawtio-preferences
+```
 
-    npm install -g bower gulp slush slush-hawtio-javascript slush-hawtio-typescript typescript
+### Install development tools
 
-Then install all local nodejs packages and update bower dependencies via:
+* [Node.js](http://nodejs.org)
+* [Yarn](https://yarnpkg.com)
+* [gulp](http://gulpjs.com/)
 
-    npm install
-    bower update
+### Install project dependencies
 
-Then to run the web application:
+```
+yarn install:dev
+```
 
-    gulp
+### Run the demo web application
 
-#### Install the bower package
+```
+gulp
+```
 
-    bower install --save hawtio-preferences
+### Change the default proxy port
 
-#### Output build to a different directory
+To proxy to a local JVM running on a different port than `8282` specify the `--port` CLI arguement to gulp:
+```
+gulp --port=8181
+```
+### Output build to a different directory
 
 When developing this plugin in a dependent console you can change the output directory where the compiled `.js` and `.css` go.  Just use the `--out` flag to set a different output directory, for example:
 
@@ -36,7 +51,7 @@ When developing this plugin in a dependent console you can change the output dir
 
 Whenever the build completes the compiled `.js` file will be put into the target directory.  Don't forget to first do a `gulp build` without this flag before committing changes!
 
-#### Turn on source maps generation for debugging TypeScript
+### Turn on source maps generation for debugging TypeScript
 
 If you want to debug `.ts` using a browser developer tool such as Chrome DevTools, pass the `--sourcemap` flag to gulp:
 
