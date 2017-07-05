@@ -123,12 +123,13 @@ var HawtioPreferences;
                     return new HawtioPreferences.PreferencesRegistry($rootScope);
                 }]);
         }]);
-    HawtioPreferences._module.run(['$templateCache', 'HawtioExtension', '$compile', 'preferencesRegistry', function ($templateCache, ext, $compile, preferencesRegistry) {
+    HawtioPreferences._module.run(['$templateCache', 'HawtioExtension', '$compile', 'preferencesRegistry', 'helpRegistry', function ($templateCache, ext, $compile, preferencesRegistry, helpRegistry) {
             ext.add('hawtio-user', function ($scope) {
                 var template = $templateCache.get(UrlHelpers.join(HawtioPreferences.templatePath, 'menuItem.html'));
                 return $compile(template)($scope);
             });
             HawtioPreferences.log.debug("loaded");
+            helpRegistry.addUserDoc('preferences', 'plugins/preferences/doc/help.md');
             preferencesRegistry.addTab("Console Logging", UrlHelpers.join(HawtioPreferences.templatePath, "loggingPreferences.html"));
             preferencesRegistry.addTab("Reset", UrlHelpers.join(HawtioPreferences.templatePath, "resetPreferences.html"));
         }]);
