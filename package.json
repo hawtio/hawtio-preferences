@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@hawtio/extension-service": "^3.0.1",
-    "@hawtio/forms": "^3.0.7"
+    "@hawtio/forms": "^3.0.7",
+    "@hawtio/help": "^3.0.0"
   },
   "devDependencies": {
     "del": "^2.2.0",

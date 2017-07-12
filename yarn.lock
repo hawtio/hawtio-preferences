@@ -60,6 +60,12 @@
     "@hawtio/core-dts" "^3.0.12"
     "@hawtio/ui" "^3.0.25"
 
+"@hawtio/help@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/help/-/help-3.0.0.tgz#cea46dddb09e2f78b1f5ef81252d334ad58b61e5"
+  dependencies:
+    "@hawtio/ui" "^3.0.25"
+
 "@hawtio/template-cache@^3.0.3":
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/@hawtio/template-cache/-/template-cache-3.0.4.tgz#2e04b34919ec1981f8bd1f6c30451c3ea63a5c58"
