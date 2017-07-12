@@ -16,7 +16,7 @@ var config = {
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   ts: ['plugins/**/*.ts'],
   less: ['plugins/**/*.less'],
-  templates: ['plugins/**/*.html'],
+  templates: ['plugins/**/*.html', 'plugins/**/doc/*.md'],
   templateModule: 'hawtio-preferences-templates',
   dist: argv.out || './dist/',
   js: 'hawtio-preferences.js',
