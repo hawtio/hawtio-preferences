@@ -13,8 +13,8 @@
     "test": "gulp build"
   },
   "dependencies": {
-    "@hawtio/extension-service": "^3.0.1",
-    "@hawtio/forms": "^3.0.7"
+    "@hawtio/extension-service": "~3.0.1",
+    "@hawtio/forms": "~3.0.7"
   },
   "devDependencies": {
     "del": "^2.2.0",
@@ -45,5 +45,8 @@
   },
   "resolutions": {
     "jquery": "2.2.4"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
