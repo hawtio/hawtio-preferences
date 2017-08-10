@@ -8,8 +8,7 @@
   ],
   "scripts": {
     "start": "gulp",
-    "build": "gulp build",
-    "test": "gulp build"
+    "build": "gulp build"
   },
   "dependencies": {
     "@hawtio/extension-service": "~3.0.1",

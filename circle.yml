@@ -11,12 +11,12 @@ branches:
 dependencies:
   pre:
     - rm -rf ~/.yarn
-    - npm install --global yarn
+    - npm install --global yarn gulp
   override:
-    - yarn run install
+    - yarn install
   cache_directories:
     - ~/.cache/yarn
 
 test:
   override:
-    - yarn test
+    - gulp build
