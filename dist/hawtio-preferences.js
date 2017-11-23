@@ -78,7 +78,7 @@ var HawtioPreferences;
 })(HawtioPreferences || (HawtioPreferences = {}));
 var HawtioPreferences;
 (function (HawtioPreferences) {
-    var PreferencesRegistry = (function () {
+    var PreferencesRegistry = /** @class */ (function () {
         function PreferencesRegistry($rootScope) {
             this.$rootScope = $rootScope;
             this.tabs = {};
