@@ -1,5 +1,5 @@
 /// <reference path="preferencesPlugin.ts"/>
-module HawtioPreferences {
+namespace HawtioPreferences {
 
   _module.service('PreferencesLastPath', () => {
     return {

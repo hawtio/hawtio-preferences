@@ -1,4 +1,4 @@
-module HawtioPreferences {
+namespace HawtioPreferences {
 
   export class PreferencesRegistry {
 

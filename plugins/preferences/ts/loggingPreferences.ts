@@ -1,6 +1,6 @@
 /// <reference path="preferencesPlugin.ts"/>
 /// <reference path="preferenceHelpers.ts"/>
-module HawtioPreferences {
+namespace HawtioPreferences {
 
   _module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "SchemaRegistry", ($scope, schemas:HawtioForms.SchemaRegistry) => {
 

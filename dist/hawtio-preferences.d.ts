@@ -1,5 +1,5 @@
 /// <reference types="angular" />
-declare module HawtioPreferences {
+declare namespace HawtioPreferences {
     var pluginName: string;
     var templatePath: string;
     var log: Logging.Logger;
@@ -21,7 +21,7 @@ declare module HawtioPreferences {
      */
     function isValidFunction(workspace: any, validFn: any, perspectiveId: string): boolean;
 }
-declare module HawtioPreferences {
+declare namespace HawtioPreferences {
     class PreferencesRegistry {
         private $rootScope;
         private tabs;
@@ -31,12 +31,12 @@ declare module HawtioPreferences {
         getTabs(): any;
     }
 }
-declare module HawtioPreferences {
+declare namespace HawtioPreferences {
     var _module: angular.IModule;
 }
-declare module HawtioPreferences {
+declare namespace HawtioPreferences {
 }
-declare module HawtioPreferences {
+declare namespace HawtioPreferences {
 }
-declare module HawtioPreferences {
+declare namespace HawtioPreferences {
 }

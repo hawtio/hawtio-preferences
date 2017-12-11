@@ -1,4 +1,4 @@
-module HawtioPreferences {
+namespace HawtioPreferences {
 
   export var pluginName = 'hawtio-preferences';
   export var templatePath = 'plugins/preferences/html';

@@ -1,6 +1,6 @@
 /// <reference path="preferenceHelpers.ts"/>
 /// <reference path="preferencesRegistry.ts"/>
-module HawtioPreferences {
+namespace HawtioPreferences {
   export var _module = angular.module(pluginName, []);
 
   // preference registry service that plugins can register preference pages to
