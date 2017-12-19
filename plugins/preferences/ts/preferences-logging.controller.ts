@@ -1,9 +1,8 @@
-/// <reference path="preferencesPlugin.ts"/>
-/// <reference path="preferenceHelpers.ts"/>
-namespace HawtioPreferences {
+module HawtioPreferences {
 
-  _module.controller("HawtioPreferences.LoggingPreferences", ["$scope", "SchemaRegistry", ($scope, schemas:HawtioForms.SchemaRegistry) => {
-
+  export function PreferencesLoggingController($scope, SchemaRegistry: HawtioForms.SchemaRegistry) {
+    'ngInject';
+    
     function getLoggers() {
       var allLoggers = Logger['loggers'];
       var allLoggersEnum = _.keys(allLoggers);
@@ -22,7 +21,7 @@ namespace HawtioPreferences {
       Debug: 'DEBUG'
     };
 
-    schemas.addSchema('ChildLoggers', {
+    SchemaRegistry.addSchema('ChildLoggers', {
       properties: {
         logger: {
           type: "string",
@@ -41,7 +40,7 @@ namespace HawtioPreferences {
         logBuffer: {
           type: 'number',
           default: 100,
-          description: 'The number of log statements to keep available in the logging console' 
+          description: 'The number of log statements to keep available in the logging console'
         },
         globalLogLevel: {
           type: 'string',
@@ -61,7 +60,7 @@ namespace HawtioPreferences {
       if (!$scope.childLoggers) {
         return;
       }
-      _.forEach($scope.childLoggers, (child:any) => {
+      _.forEach($scope.childLoggers, (child: any) => {
         Logger.get(child.logger).setLevel(Logger[child.level]);
       });
     }
@@ -105,8 +104,8 @@ namespace HawtioPreferences {
         'formatter': parseInt,
         'post': (newValue) => {
           window['LogBuffer'] = newValue;
-        }  
+        }
       }
     });
-  }]);
+  }
 }

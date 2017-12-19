@@ -2,13 +2,12 @@ namespace HawtioPreferences {
 
   export class PreferencesRegistry {
 
-    private tabs:any = {};
+    private tabs: any = {};
 
-    constructor(private $rootScope:ng.IRootScopeService) {
-
+    constructor(private $rootScope: ng.IRootScopeService) {
     }
 
-    public addTab(name:string, template:string, isValid: () => boolean = undefined) {
+    addTab(name: string, template: string, isValid: () => boolean = undefined) {
       if (!isValid) {
         isValid = () => { return true; };
       }
@@ -20,11 +19,11 @@ namespace HawtioPreferences {
       Core.$apply(this.$rootScope);
     }
 
-    public getTab(name:string) {
+    getTab(name: string) {
       return this.tabs[name];
     }
 
-    public getTabs():any {
+    getTabs() {
       var answer = {};
       angular.forEach(this.tabs, (value, key) => {
         if (value.isValid()) {
@@ -33,7 +32,7 @@ namespace HawtioPreferences {
       });
       return answer;
     }
-    
+
   }
 
 }
