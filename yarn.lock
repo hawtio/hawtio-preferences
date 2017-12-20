@@ -19,9 +19,9 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hawtio/core-dts@~3.0.11", "@hawtio/core-dts@~3.0.12":
-  version "3.0.17"
-  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.0.17.tgz#ee4981ef95a3251d00704d3baf1bc66830b6d095"
+"@hawtio/core-dts@~3.0.11", "@hawtio/core-dts@~3.0.12", "@hawtio/core-dts@~3.0.18":
+  version "3.0.18"
+  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.0.18.tgz#20d1ff7e839c0e3180c18e954ad7a305c4ba2b24"
   dependencies:
     "@types/jquery" "~2.0.46"
 
@@ -44,14 +44,6 @@
     lodash "~4.17.4"
     patternfly "~3.30.0"
     urijs "~1.19.0"
-
-"@hawtio/forms@~3.0.7":
-  version "3.0.12"
-  resolved "https://registry.yarnpkg.com/@hawtio/forms/-/forms-3.0.12.tgz#7f73abffd4c2127038fad14183ecad8ce5e9452a"
-  dependencies:
-    "@hawtio/core" "~3.1.0"
-    "@hawtio/core-dts" "~3.0.12"
-    "@hawtio/ui" "~3.0.25"
 
 "@hawtio/help@~3.0.0":
   version "3.0.3"
@@ -199,11 +191,11 @@ angular-file-upload@~2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/angular-file-upload/-/angular-file-upload-2.5.0.tgz#0f53c93fbc70ed8ba8340a9a289ba64b680e2167"
 
-angular-route@~1.6.6:
+angular-route@1.6.6, angular-route@~1.6.6:
   version "1.6.6"
   resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.6.6.tgz#8c11748aa195c717b1b615a7e746442bfc7c61f4"
 
-angular-sanitize@~1.6.4:
+angular-sanitize@1.6.6, angular-sanitize@~1.6.4:
   version "1.6.6"
   resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.6.6.tgz#0fd065a19931517fbece66596d325d72b6e06041"
 
@@ -211,7 +203,7 @@ angular-ui-bootstrap@~2.5.0:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
 
-angular@~1.6.4:
+angular@1.6.6, angular@~1.6.4:
   version "1.6.6"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.6.tgz#fd5a3cfb437ce382d854ee01120797978527cb64"
 

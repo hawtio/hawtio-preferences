@@ -8,13 +8,13 @@ namespace HawtioPreferences {
 
     saveLocation($location: ng.ILocationService) {
       this.$window.sessionStorage.setItem('lastPath', $location.path());
-      this.$window.sessionStorage.setItem('lastSearch', $location.search());
+      this.$window.sessionStorage.setItem('lastSearch', JSON.stringify($location.search()));
     }
 
     restoreLocation($location: ng.ILocationService) {
       $location
         .path(this.$window.sessionStorage.getItem('lastPath'))
-        .search(this.$window.sessionStorage.getItem('lastSearch'));
+        .search(JSON.parse(this.$window.sessionStorage.getItem('lastSearch')));
     }
 
     /**

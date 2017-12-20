@@ -8,7 +8,7 @@ namespace HawtioPreferences {
     'ngInject';
     
     HawtioExtension.add('hawtio-user', ($scope) => {
-      var template = $templateCache.get<string>('plugins/preferences/html/preferences-menu-item.html');
+      var template = $templateCache.get<string>(templatesLocation + 'preferences-menu-item.html');
       return $compile(template)($scope);
     });
     
@@ -16,8 +16,8 @@ namespace HawtioPreferences {
     
     helpRegistry.addUserDoc('preferences', 'plugins/preferences/doc/help.md');
     
-    preferencesRegistry.addTab("Logging", 'plugins/preferences/html/preferences-logging.html');
-    preferencesRegistry.addTab("Reset", 'plugins/preferences/html/preferences-reset.html');
+    preferencesRegistry.addTab("Console Logging", templatesLocation + 'logging-preferences.html');
+    preferencesRegistry.addTab("Reset", templatesLocation + 'preferences-reset.html');
   }
 
 }

@@ -1,9 +1,5 @@
-/// <reference types="forms" />
 /// <reference types="angular" />
 /// <reference types="help" />
-declare module HawtioPreferences {
-    function PreferencesLoggingController($scope: any, SchemaRegistry: HawtioForms.SchemaRegistry): void;
-}
 declare namespace HawtioPreferences {
     class PreferencesService {
         private $window;
@@ -55,5 +51,27 @@ declare namespace HawtioPreferences {
     function preferencesInit($templateCache: ng.ITemplateCacheService, HawtioExtension: any, $compile: ng.ICompileService, preferencesRegistry: PreferencesRegistry, helpRegistry: Help.HelpRegistry): void;
 }
 declare namespace HawtioPreferences {
+    class LoggingPreferencesService {
+        private $window;
+        constructor($window: ng.IWindowService);
+        getLogBuffer(): number;
+        setLogBuffer(logBuffer: number): void;
+        getGlobalLogLevel(): Logging.LogLevel;
+        setGlobalLogLevel(logLevel: Logging.LogLevel): void;
+        getChildLoggers(): Logging.ChildLogger[];
+        getAvailableChildLoggers(): Logging.ChildLogger[];
+        addChildLogger(childLogger: Logging.ChildLogger): void;
+        removeChildLogger(childLogger: Logging.ChildLogger): void;
+        saveChildLoggers(childLoggers: Logging.ChildLogger[]): void;
+    }
+}
+declare namespace HawtioPreferences {
+    function LoggingPreferencesController($scope: any, loggingPreferencesService: LoggingPreferencesService): void;
+}
+declare namespace HawtioPreferences {
+    const loggingPreferencesModule: string;
+}
+declare namespace HawtioPreferences {
     const log: Logging.Logger;
+    const templatesLocation = "plugins/preferences/html/";
 }

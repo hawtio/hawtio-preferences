@@ -80,8 +80,8 @@ gulp.task('watch-less', function() {
 });
 
 gulp.task('watch', ['build', 'watch-less'], function() {
-  gulp.watch(['index.html', 'dist/*.js'], ['reload']);
-  gulp.watch([config.ts, config.templates], ['tsc', 'template', 'concat', 'clean']);
+  gulp.watch(['index.html', 'dist/*'], ['reload']);
+  gulp.watch([config.ts, config.templates], ['build']);
 });
 
 gulp.task('connect', ['watch'], function() {
