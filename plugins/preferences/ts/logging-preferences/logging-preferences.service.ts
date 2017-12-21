@@ -2,6 +2,9 @@ namespace HawtioPreferences {
 
   export class LoggingPreferencesService {
 
+    private static DEFAULT_LOG_BUFFER_SIZE = 100;
+    private static DEFAULT_GLOBAL_LOG_LEVEL = Logger.INFO;
+
     constructor(private $window: ng.IWindowService) {
       'ngInject';
     }
@@ -10,7 +13,7 @@ namespace HawtioPreferences {
       if (window.localStorage.getItem('logBuffer') !== null) {
         return parseInt(this.$window.localStorage.getItem('logBuffer'), 10);
       } else {
-        return 100;
+        return LoggingPreferencesService.DEFAULT_LOG_BUFFER_SIZE;
       }
     }
 
@@ -22,16 +25,12 @@ namespace HawtioPreferences {
       if (this.$window.localStorage.getItem('logLevel') !== null) {
         return JSON.parse(this.$window.localStorage.getItem('logLevel'));
       } else {
-        return Logger.INFO;
+        return LoggingPreferencesService.DEFAULT_GLOBAL_LOG_LEVEL;
       }
     }
 
     setGlobalLogLevel(logLevel: Logging.LogLevel): void {
       this.$window.localStorage.setItem('logLevel', JSON.stringify(logLevel));
-      Logger.setLevel(logLevel);
-      this.getChildLoggers().forEach(childLogger => {
-        Logger.get(childLogger.name).setLevel(childLogger.filterLevel);
-      });
     }
     
     getChildLoggers(): Logging.ChildLogger[] {
@@ -52,18 +51,25 @@ namespace HawtioPreferences {
     addChildLogger(childLogger: Logging.ChildLogger): void {
       const childLoggers = this.getChildLoggers();
       childLoggers.push(childLogger);
-      this.saveChildLoggers(childLoggers);
+      this.setChildLoggers(childLoggers);
     }  
 
     removeChildLogger(childLogger: Logging.ChildLogger): void {
       const childLoggers = this.getChildLoggers();
       _.remove(childLoggers, c => c.name === childLogger.name);
-      this.saveChildLoggers(childLoggers);
+      this.setChildLoggers(childLoggers);
       Logger.get(childLogger.name).setLevel(this.getGlobalLogLevel());
     }  
     
-    saveChildLoggers(childLoggers: Logging.ChildLogger[]): void {
+    setChildLoggers(childLoggers: Logging.ChildLogger[]): void {
       this.$window.localStorage.setItem('childLoggers', JSON.stringify(childLoggers));
+    }
+
+    reconfigureLoggers(): void {
+      Logger.setLevel(this.getGlobalLogLevel());
+      this.getChildLoggers().forEach(childLogger => {
+        Logger.get(childLogger.name).setLevel(childLogger.filterLevel);
+      });
     }
 
   }

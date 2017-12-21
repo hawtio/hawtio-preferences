@@ -14,9 +14,16 @@ namespace HawtioPreferences {
     $scope.availableChildLoggers = loggingPreferencesService.getAvailableChildLoggers();
     $scope.availableLogLevels = [Logger.OFF, Logger.ERROR, Logger.WARN, Logger.INFO, Logger.DEBUG];
 
-    $scope.onLogBufferChange = logBuffer => loggingPreferencesService.setLogBuffer(logBuffer);
+    $scope.onLogBufferChange = logBuffer => {
+      if (logBuffer) {
+        loggingPreferencesService.setLogBuffer(logBuffer);
+      }
+    }
 
-    $scope.onLogLevelChange = logLevel => loggingPreferencesService.setGlobalLogLevel(logLevel);
+    $scope.onLogLevelChange = logLevel => {
+      loggingPreferencesService.setGlobalLogLevel(logLevel);
+      loggingPreferencesService.reconfigureLoggers();
+    }
 
     $scope.addChildLogger = childLogger => {
       loggingPreferencesService.addChildLogger(childLogger);
@@ -30,7 +37,10 @@ namespace HawtioPreferences {
       $scope.availableChildLoggers = loggingPreferencesService.getAvailableChildLoggers();
     };
     
-    $scope.onChildLoggersChange = childLoggers => loggingPreferencesService.saveChildLoggers(childLoggers);
+    $scope.onChildLoggersChange = childLoggers => {
+      loggingPreferencesService.setChildLoggers(childLoggers);
+      loggingPreferencesService.reconfigureLoggers();
+    }
   }
 
 }

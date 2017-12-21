@@ -53,6 +53,8 @@ declare namespace HawtioPreferences {
 declare namespace HawtioPreferences {
     class LoggingPreferencesService {
         private $window;
+        private static DEFAULT_LOG_BUFFER_SIZE;
+        private static DEFAULT_GLOBAL_LOG_LEVEL;
         constructor($window: ng.IWindowService);
         getLogBuffer(): number;
         setLogBuffer(logBuffer: number): void;
@@ -62,7 +64,8 @@ declare namespace HawtioPreferences {
         getAvailableChildLoggers(): Logging.ChildLogger[];
         addChildLogger(childLogger: Logging.ChildLogger): void;
         removeChildLogger(childLogger: Logging.ChildLogger): void;
-        saveChildLoggers(childLoggers: Logging.ChildLogger[]): void;
+        setChildLoggers(childLoggers: Logging.ChildLogger[]): void;
+        reconfigureLoggers(): void;
     }
 }
 declare namespace HawtioPreferences {

@@ -6,7 +6,7 @@
         <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Number of log statements to keep in the console"></span>
       </label>
       <div class="col-md-6">
-        <input type="number" id="log-buffer" class="form-control" ng-model="logBuffer" ng-change="onLogBufferChange(logBuffer)">
+        <input type="number" id="log-buffer" class="form-control" ng-model="logBuffer" ng-blur="onLogBufferChange(logBuffer)">
       </div>
     </div>
     <div class="form-group">

@@ -251,7 +251,7 @@ var HawtioPreferences;
                 return parseInt(this.$window.localStorage.getItem('logBuffer'), 10);
             }
             else {
-                return 100;
+                return LoggingPreferencesService.DEFAULT_LOG_BUFFER_SIZE;
             }
         };
         LoggingPreferencesService.prototype.setLogBuffer = function (logBuffer) {
@@ -262,15 +262,11 @@ var HawtioPreferences;
                 return JSON.parse(this.$window.localStorage.getItem('logLevel'));
             }
             else {
-                return Logger.INFO;
+                return LoggingPreferencesService.DEFAULT_GLOBAL_LOG_LEVEL;
             }
         };
         LoggingPreferencesService.prototype.setGlobalLogLevel = function (logLevel) {
             this.$window.localStorage.setItem('logLevel', JSON.stringify(logLevel));
-            Logger.setLevel(logLevel);
-            this.getChildLoggers().forEach(function (childLogger) {
-                Logger.get(childLogger.name).setLevel(childLogger.filterLevel);
-            });
         };
         LoggingPreferencesService.prototype.getChildLoggers = function () {
             if (this.$window.localStorage.getItem('childLoggers') !== null) {
@@ -290,17 +286,25 @@ var HawtioPreferences;
         LoggingPreferencesService.prototype.addChildLogger = function (childLogger) {
             var childLoggers = this.getChildLoggers();
             childLoggers.push(childLogger);
-            this.saveChildLoggers(childLoggers);
+            this.setChildLoggers(childLoggers);
         };
         LoggingPreferencesService.prototype.removeChildLogger = function (childLogger) {
             var childLoggers = this.getChildLoggers();
             _.remove(childLoggers, function (c) { return c.name === childLogger.name; });
-            this.saveChildLoggers(childLoggers);
+            this.setChildLoggers(childLoggers);
             Logger.get(childLogger.name).setLevel(this.getGlobalLogLevel());
         };
-        LoggingPreferencesService.prototype.saveChildLoggers = function (childLoggers) {
+        LoggingPreferencesService.prototype.setChildLoggers = function (childLoggers) {
             this.$window.localStorage.setItem('childLoggers', JSON.stringify(childLoggers));
         };
+        LoggingPreferencesService.prototype.reconfigureLoggers = function () {
+            Logger.setLevel(this.getGlobalLogLevel());
+            this.getChildLoggers().forEach(function (childLogger) {
+                Logger.get(childLogger.name).setLevel(childLogger.filterLevel);
+            });
+        };
+        LoggingPreferencesService.DEFAULT_LOG_BUFFER_SIZE = 100;
+        LoggingPreferencesService.DEFAULT_GLOBAL_LOG_LEVEL = Logger.INFO;
         return LoggingPreferencesService;
     }());
     HawtioPreferences.LoggingPreferencesService = LoggingPreferencesService;
@@ -318,8 +322,15 @@ var HawtioPreferences;
         $scope.childLoggers = loggingPreferencesService.getChildLoggers();
         $scope.availableChildLoggers = loggingPreferencesService.getAvailableChildLoggers();
         $scope.availableLogLevels = [Logger.OFF, Logger.ERROR, Logger.WARN, Logger.INFO, Logger.DEBUG];
-        $scope.onLogBufferChange = function (logBuffer) { return loggingPreferencesService.setLogBuffer(logBuffer); };
-        $scope.onLogLevelChange = function (logLevel) { return loggingPreferencesService.setGlobalLogLevel(logLevel); };
+        $scope.onLogBufferChange = function (logBuffer) {
+            if (logBuffer) {
+                loggingPreferencesService.setLogBuffer(logBuffer);
+            }
+        };
+        $scope.onLogLevelChange = function (logLevel) {
+            loggingPreferencesService.setGlobalLogLevel(logLevel);
+            loggingPreferencesService.reconfigureLoggers();
+        };
         $scope.addChildLogger = function (childLogger) {
             loggingPreferencesService.addChildLogger(childLogger);
             $scope.childLoggers = loggingPreferencesService.getChildLoggers();
@@ -330,7 +341,10 @@ var HawtioPreferences;
             $scope.childLoggers = loggingPreferencesService.getChildLoggers();
             $scope.availableChildLoggers = loggingPreferencesService.getAvailableChildLoggers();
         };
-        $scope.onChildLoggersChange = function (childLoggers) { return loggingPreferencesService.saveChildLoggers(childLoggers); };
+        $scope.onChildLoggersChange = function (childLoggers) {
+            loggingPreferencesService.setChildLoggers(childLoggers);
+            loggingPreferencesService.reconfigureLoggers();
+        };
     }
     HawtioPreferences.LoggingPreferencesController = LoggingPreferencesController;
 })(HawtioPreferences || (HawtioPreferences = {}));
@@ -370,7 +384,7 @@ var HawtioPreferences;
     hawtioPluginLoader.addModule(pluginName);
 })(HawtioPreferences || (HawtioPreferences = {}));
 
-angular.module("hawtio-preferences-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/preferences/html/logging-preferences.html","<div ng-controller=\"HawtioPreferences.PreferencesLoggingController\">\n  <form class=\"form-horizontal logging-preferences-form\">\n    <div class=\"form-group\">\n      <label class=\"col-md-2 control-label\" for=\"log-buffer\">\n        Log buffer\n        <span class=\"pficon pficon-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Number of log statements to keep in the console\"></span>\n      </label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" id=\"log-buffer\" class=\"form-control\" ng-model=\"logBuffer\" ng-change=\"onLogBufferChange(logBuffer)\">\n      </div>\n    </div>\n    <div class=\"form-group\">\n      <label class=\"col-md-2 control-label\" for=\"log-level\">Global log level</label>\n      <div class=\"col-md-6\">\n        <select id=\"log-level\" class=\"form-control\" ng-model=\"logLevel\"\n                ng-options=\"logLevel.name for logLevel in availableLogLevels track by logLevel.name\"\n                ng-change=\"onLogLevelChange(logLevel)\">\n        </select>\n      </div>\n    </div>\n    <div class=\"form-group\">\n      <label class=\"col-md-2 control-label\" for=\"log-buffer\">Child loggers</label>\n      <div class=\"col-md-6\">\n        <div class=\"form-group\" ng-repeat=\"childLogger in childLoggers track by childLogger.name\">\n          <label class=\"col-md-4 control-label child-logger-label\" for=\"log-level\">\n            {{childLogger.name}}\n          </label>\n          <div class=\"col-md-8\">\n            <select id=\"log-level\" class=\"form-control child-logger-select\" ng-model=\"childLogger.filterLevel\"\n                    ng-options=\"logLevel.name for logLevel in availableLogLevels track by logLevel.name\"\n                    ng-change=\"onChildLoggersChange(childLoggers)\">\n            </select>\n            <button type=\"button\" class=\"btn btn-default child-logger-delete-button\" ng-click=\"removeChildLogger(childLogger)\">\n              <span class=\"pficon pficon-delete\"></span>\n            </button>\n          </div>\n        </div>\n        <div>\n          <div class=\"dropdown\">\n            <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"addChildLogger\" data-toggle=\"dropdown\">\n              Add\n              <span class=\"caret\"></span>\n            </button>\n            <ul class=\"dropdown-menu\" role=\"menu\" aria-labelledby=\"addChildLogger\">\n              <li role=\"presentation\" ng-repeat=\"availableChildLogger in availableChildLoggers track by availableChildLogger.name\">\n                <a role=\"menuitem\" tabindex=\"-1\" href=\"#\" ng-click=\"addChildLogger(availableChildLogger)\">\n                  {{ availableChildLogger.name }}\n                </a>\n              </li>\n            </ul>\n          </div>          \n        </div>\n      </div>\n    </div>\n  </form>\n</div>\n");
+angular.module("hawtio-preferences-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/preferences/html/logging-preferences.html","<div ng-controller=\"HawtioPreferences.PreferencesLoggingController\">\n  <form class=\"form-horizontal logging-preferences-form\">\n    <div class=\"form-group\">\n      <label class=\"col-md-2 control-label\" for=\"log-buffer\">\n        Log buffer\n        <span class=\"pficon pficon-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Number of log statements to keep in the console\"></span>\n      </label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" id=\"log-buffer\" class=\"form-control\" ng-model=\"logBuffer\" ng-blur=\"onLogBufferChange(logBuffer)\">\n      </div>\n    </div>\n    <div class=\"form-group\">\n      <label class=\"col-md-2 control-label\" for=\"log-level\">Global log level</label>\n      <div class=\"col-md-6\">\n        <select id=\"log-level\" class=\"form-control\" ng-model=\"logLevel\"\n                ng-options=\"logLevel.name for logLevel in availableLogLevels track by logLevel.name\"\n                ng-change=\"onLogLevelChange(logLevel)\">\n        </select>\n      </div>\n    </div>\n    <div class=\"form-group\">\n      <label class=\"col-md-2 control-label\" for=\"log-buffer\">Child loggers</label>\n      <div class=\"col-md-6\">\n        <div class=\"form-group\" ng-repeat=\"childLogger in childLoggers track by childLogger.name\">\n          <label class=\"col-md-4 control-label child-logger-label\" for=\"log-level\">\n            {{childLogger.name}}\n          </label>\n          <div class=\"col-md-8\">\n            <select id=\"log-level\" class=\"form-control child-logger-select\" ng-model=\"childLogger.filterLevel\"\n                    ng-options=\"logLevel.name for logLevel in availableLogLevels track by logLevel.name\"\n                    ng-change=\"onChildLoggersChange(childLoggers)\">\n            </select>\n            <button type=\"button\" class=\"btn btn-default child-logger-delete-button\" ng-click=\"removeChildLogger(childLogger)\">\n              <span class=\"pficon pficon-delete\"></span>\n            </button>\n          </div>\n        </div>\n        <div>\n          <div class=\"dropdown\">\n            <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"addChildLogger\" data-toggle=\"dropdown\">\n              Add\n              <span class=\"caret\"></span>\n            </button>\n            <ul class=\"dropdown-menu\" role=\"menu\" aria-labelledby=\"addChildLogger\">\n              <li role=\"presentation\" ng-repeat=\"availableChildLogger in availableChildLoggers track by availableChildLogger.name\">\n                <a role=\"menuitem\" tabindex=\"-1\" href=\"#\" ng-click=\"addChildLogger(availableChildLogger)\">\n                  {{ availableChildLogger.name }}\n                </a>\n              </li>\n            </ul>\n          </div>          \n        </div>\n      </div>\n    </div>\n  </form>\n</div>\n");
 $templateCache.put("plugins/preferences/html/preferences-menu-item.html","<li ng-controller=\"HawtioPreferences.PreferencesMenuItemController\">\n  <a href=\"\" ng-click=\"gotoPreferences()\">Preferences</a>\n</li>\n");
 $templateCache.put("plugins/preferences/html/preferences-reset.html","<div ng-controller=\"HawtioPreferences.PreferencesResetController\">\n  <div class=\"alert alert-success preferences-reset-alert\" ng-if=\"showAlert\">\n    <span class=\"pficon pficon-ok\"></span>\n    Settings reset successfully!\n  </div>\n  <h3>Reset settings</h3>\n  <p>\n    Clear all custom settings stored in your browser\'s local storage and reset to defaults.\n  </p>\n  <p>\n    <button class=\"btn btn-danger\" ng-click=\"doReset()\">Reset settings</button>\n  </p>\n</div>");
 $templateCache.put("plugins/preferences/html/preferences.html","<div ng-controller=\"HawtioPreferences.PreferencesController\">\n  <button class=\"btn btn-primary pull-right\" ng-click=\"close()\">Close</button>\n  <h1>\n    Preferences\n  </h1>\n  <ul class=\"nav nav-tabs\" hawtio-auto-dropdown>\n    <li ng-repeat=\"name in names\" ng-class=\"active(name)\">\n      <a href=\"#\" ng-click=\"setPanel(name)\">{{name}}</a>\n    </li>\n    <li class=\"dropdown overflow\">\n      <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">\n        More <span class=\"caret\"></span>\n      </a>\n      <ul class=\"dropdown-menu\" role=\"menu\"></ul>\n    </li>\n  </ul>\n  <div ng-include=\"getPrefs(pref)\"></div>\n</div>\n");
