@@ -1,6 +1,6 @@
 {
   "name": "@hawtio/preferences",
-  "version": "3.0.12",
+  "version": "3.0.13",
   "main": "dist/hawtio-preferences.js",
   "types": "dist/hawtio-preferences.d.ts",
   "files": [
