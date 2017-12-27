@@ -1,3 +1,7 @@
+# DEPRECATED
+
+**This project has been moved to [hawtio-core](https://github.com/hawtio/hawtio-core)**
+
 # hawtio-preferences
 
 [![CircleCI](https://circleci.com/gh/hawtio/hawtio-preferences.svg?style=svg)](https://circleci.com/gh/hawtio/hawtio-preferences)
